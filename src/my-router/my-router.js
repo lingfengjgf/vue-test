@@ -4,11 +4,32 @@ class VueRouter {
   constructor(options){
     this.$options=options;
 
-    Vue.util.defineReactive(this,'current',window.location.hash.slice(1)||'/')
+    // Vue.util.defineReactive(this,'current',window.location.hash.slice(1)||'/')
+
+    this.current=window.location.hash.slice(1)||'/';
+    Vue.util.defineReactive(this,'matched',[]);
+    this.match();
     window.addEventListener('hashchange',()=>{
       // console.log(window.location.hash);
-      this.current=window.location.hash.slice(1)||'/'
+      this.current=window.location.hash.slice(1)||'/';
+      this.matched=[];
+      this.match();
     })
+  }
+
+  match(el){
+    const routes=el||this.$options.routes;
+    for (const route of routes) {
+      if(this.current==='/'&&route.path==='/'){
+        this.matched.push(route);
+        return ;
+      }
+      if(route.path!='/'&&this.current.indexOf(route.path)>-1){
+        this.matched.push(route);
+        route.children&&this.match(route.children);
+        return ;        
+      }
+    }
   }
 }
 
@@ -43,11 +64,26 @@ VueRouter.install=(_Vue)=>{
   //注册组件 router-view
   Vue.component('router-view',{
     render(h){
+      //获取当前router-view的深度
+      this.$vnode.data.routerView=true;
+      let parent=this.$parent;
+      let depth=0;
+      // console.log('parent:',parent);
+      while(parent){
+        const vnodeData=parent.$vnode&&parent.$vnode.data;
+        if(vnodeData&&vnodeData.routerView){
+          depth++;
+        }
+        parent=parent.$parent;
+      }
+      // console.log(depth);
       // console.log("$router:",this.$router);
       // console.log("current:",this.$router.current);
-      const routes=this.$router.$options.routes;
+      // const routes=this.$router.$options.routes;
       // console.log("routes:",routes);
-      const route=routes.find(route=>route.path===this.$router.current);
+
+      // console.log("matched:",this.$router.matched);
+      const route=this.$router.matched[depth];
       let component=null;
       if(route){
         component=route.component;
