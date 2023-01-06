@@ -1,11 +1,11 @@
 import Vue from 'vue'
 import App from './App.vue'
-import store from './store'
+import store from './my-store'
+// import store from './store'
 import router from './my-router'
 // import router from './router'
 
 Vue.config.productionTip = false
-
 
 new Vue({
   // 添加到配置项中，为什么？
