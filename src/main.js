@@ -5,6 +5,8 @@ import store from './my-store'
 import router from './my-router'
 // import router from './router'
 
+import '@/icon';
+
 import Notice from './components/Notice';
 import create from './utils/create';
 
