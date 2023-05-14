@@ -11,6 +11,9 @@ const rendererOptions = {
     // anchor为null则为appendChild
     parent.insertBefore(child, anchor || null);
   },
+  setElementText(el, text) {
+    el.textContent = text;
+  },
 };
 
 // 确保renderer单例

@@ -1,4 +1,4 @@
-import { reactive } from "../reactivity";
+import { reactive, effect } from "../reactivity";
 
 export function createRenderer(options) {
   // render负责渲染组件内容
@@ -13,10 +13,21 @@ export function createRenderer(options) {
     const componentUpdateFn = () => {
       // 渲染视图
       const el = rootComponent.render.call(observed);
+      // 清空之前的文字
+      options.setElementText(container, "");
       // 追加到宿主
       options.insert(el, container);
     };
+
+    // 设置激活的副作用
+    effect(componentUpdateFn);
+
     componentUpdateFn();
+
+    // 挂载钩子
+    if (rootComponent.mounted) {
+      rootComponent.mounted.call(observed);
+    }
   };
 
   // 返回一个渲染器实例

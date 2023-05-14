@@ -14,4 +14,9 @@ createApp({
     h3.textContent = this.title;
     return h3;
   },
+  mounted() {
+    setTimeout(() => {
+      this.title = "data change!";
+    }, 2000);
+  },
 }).mount("#app");
