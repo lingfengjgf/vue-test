@@ -3,7 +3,12 @@ import { createVNode } from "./vnode";
 
 export { createVNode } from "./vnode";
 export function createRenderer(options) {
-  const { createElement: hostCreateElement, insert: hostInsert } = options;
+  const {
+    createElement: hostCreateElement,
+    insert: hostInsert,
+    setElementText: hostSetElementText,
+    remove: hostRemove,
+  } = options;
   // render负责渲染组件内容
   // const render = (rootComponent, selector) => {
   //   // 获取宿主
@@ -39,7 +44,6 @@ export function createRenderer(options) {
     if (vndoe) {
       patch(container._vnode || null, vndoe, container);
     }
-
     // 保存最新的vnode
     container._vnode = vndoe;
   };
@@ -89,19 +93,28 @@ export function createRenderer(options) {
   const setupRenderEffect = (instance, container) => {
     // 声明组件更新函数
     const componentUpdateFn = () => {
+      const { render, mounted } = instance.vndoe.type;
       if (!instance.isMounted) {
         // 创建阶段
         // 执行组件渲染函数获取其vnode
-        const { render, mounted } = instance.vndoe.type;
-        const vnode = render.call(instance.data);
+        const vnode = (instance.subTree = render.call(instance.data));
         // 递归patch嵌套节点
         patch(null, vnode, container);
         // 挂载钩子
         if (mounted) {
           mounted.call(instance.data);
         }
+        instance.isMounted = true;
       } else {
         // 更新阶段
+        // 获取新旧虚拟dom
+        const prevVnode = instance.subTree;
+        const nextVnode = render.call(instance.data);
+
+        // 保存最新的vnode
+        instance.subTree = nextVnode;
+        // 执行patch
+        patch(prevVnode, nextVnode);
       }
     };
 
@@ -116,6 +129,8 @@ export function createRenderer(options) {
     if (n1 === null) {
       // 创建阶段
       mountElement(n2, container);
+    } else {
+      patchElement(n1, n2);
     }
   };
 
@@ -132,6 +147,51 @@ export function createRenderer(options) {
 
     // 插入元素
     hostInsert(el, container);
+  };
+
+  const patchElement = (n1, n2) => {
+    // 获取要更新的元素
+    const el = (n2.el = n1.el);
+
+    // 更新type相同的节点，还需要考虑key
+    if (n1.type === n2.type) {
+      const oldCh = n1.children;
+      const newCh = n2.children;
+
+      // 根据双方子元素的情况做不同处理
+      if (typeof oldCh === "string") {
+        if (typeof newCh === "string") {
+          if (oldCh !== newCh) {
+            hostSetElementText(el, newCh);
+          }
+        } else {
+          hostSetElementText(el, "");
+          newCh.forEach((ch) => patch(null, ch, el));
+        }
+      } else {
+        if (typeof newCh === "string") {
+          hostSetElementText(el, newCh);
+        } else {
+          updateChildren(oldCh, newCh, el);
+        }
+      }
+    }
+  };
+
+  const updateChildren = (oldCh, newCh, parentElm) => {
+    // 简单实现，一对一替换
+    const len = Math.min(oldCh.length, newCh.length);
+    for (let i = 0; i < len; i++) {
+      patch(oldCh[i], newCh[i]);
+    }
+    // 获取较长数组中剩余的部分
+    if (newCh.length > oldCh.length) {
+      // 新数组较长，剩余的批量创建
+      newCh.slice(len).forEach((ch) => patch(null, ch, parentElm));
+    } else {
+      // 老数组较长，剩余的批量删除
+      oldCh.slice(len).forEach((ch) => hostRemove(ch.el));
+    }
   };
 
   // 返回一个渲染器实例

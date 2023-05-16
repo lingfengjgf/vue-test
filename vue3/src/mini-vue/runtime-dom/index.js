@@ -17,6 +17,12 @@ const rendererOptions = {
   createElement(tag) {
     return document.createElement(tag);
   },
+  remove(el) {
+    const parent = el.parentNode;
+    if (parent) {
+      parent.removeChild(el);
+    }
+  },
 };
 
 // 确保renderer单例

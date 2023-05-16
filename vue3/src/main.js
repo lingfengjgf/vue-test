@@ -7,7 +7,7 @@ import "./style.css";
 createApp({
   data() {
     return {
-      title: "Hello mini-vue!",
+      title: ["Hello", "mini-vue!", "hhh"],
     };
   },
   render() {
@@ -15,11 +15,21 @@ createApp({
     // h3.textContent = this.title;
     // return h3;
     // 返回虚拟dom
-    return createVNode("h3", {}, this.title);
+
+    if (Array.isArray(this.title)) {
+      return createVNode(
+        "h3",
+        {},
+        this.title.map((t) => createVNode("p", {}, t))
+      );
+    } else {
+      return createVNode("h3", {}, this.title);
+    }
   },
   mounted() {
     setTimeout(() => {
-      this.title = "data change!";
+      // this.title = "data change!";
+      this.title = ["data", "change!"];
     }, 2000);
   },
 }).mount("#app");
