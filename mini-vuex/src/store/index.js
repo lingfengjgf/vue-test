@@ -1,8 +1,11 @@
-import { createStore } from "vuex";
+// import { createStore } from "vuex";
+import { createStore } from "../mini-vuex";
 
 const store = createStore({
-  state: {
-    count: 1,
+  state() {
+    return {
+      count: 1,
+    };
   },
   mutations: {
     add(state) {

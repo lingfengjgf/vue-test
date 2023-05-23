@@ -12,7 +12,7 @@ import HelloWorld from "./components/HelloWorld.vue";
     </a>
     <p @click="$store.commit('add')">{{ $store.state.count }}</p>
     <p @click="$store.dispatch('add')">{{ $store.state.count }}</p>
-    <div>doubleCounter: {{ $store.getters.doubleCounter }}</div>
+    <!-- <div>doubleCounter: {{ $store.getters.doubleCounter }}</div> -->
   </div>
   <!-- <HelloWorld msg="Vite + Vue" /> -->
 </template>
