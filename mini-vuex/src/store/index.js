@@ -2,6 +2,7 @@
 import { createStore } from "../mini-vuex";
 
 const store = createStore({
+  strict: true,
   state() {
     return {
       count: 1,
