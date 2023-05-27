@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "test:diff": "vitest src/mini-vue/diff"
   },
   "dependencies": {
     "vue": "^3.2.47"
