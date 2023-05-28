@@ -150,7 +150,58 @@ exports.diffArray = (c1, c2, { mountElement, patch, unmount, move }) => {
     }
   }
 
-  function getSequence() {
-    return [2, 3];
+  // 返回LIS的路径
+  function getSequence(arr) {
+    // return [2, 3];
+
+    const lis = [0];
+    const len = arr.length;
+
+    const record = arr.slice();
+
+    for (let i = 0; i < len; i++) {
+      const arrI = arr[i];
+      // 排除下标为0的，0是需要新增的元素，不需要移动
+      if (arrI !== 0) {
+        const last = lis[lis.length - 1];
+        // 新来的元素下标比lis最后一个大，直接放在lis最后
+        if (arr[last] < arrI) {
+          record[i] = last;
+          lis.push(i);
+          continue;
+        }
+
+        // 新来的元素下标比lis最后一个小，将lis中比它大的最小的一个替换为新的，保证lis是最长递增的
+        // 二分查找
+        let left = 0;
+        let right = lis.length - 1;
+        while (left < right) {
+          const mid = (left + right) >> 1;
+          if (arr[lis[mid]] < arrI) {
+            // 在右边
+            left = mid + 1;
+          } else {
+            // 在左边
+            right = mid;
+          }
+        }
+        // 将lis中比它大的最小的一个替换为新的
+        if (arrI < arr[lis[left]]) {
+          if (left > 0) {
+            record[i] = lis[left - 1];
+          }
+          lis[left] = i;
+        }
+      }
+    }
+
+    let i = lis.length;
+    let last = lis[i - 1];
+    while (i-- > 0) {
+      lis[i] = last;
+      last = record[last];
+    }
+
+    return lis;
   }
 };

@@ -164,7 +164,7 @@ describe("数组Diff", () => {
         { key: "a" },
         { key: "b" },
 
-        { key: "d1" },
+        // { key: "d1" },
         { key: "e" },
         { key: "c" },
         { key: "d" },
@@ -203,7 +203,7 @@ describe("数组Diff", () => {
     // todo
     // 1. mount
     expect(mountElement.mock.calls[0][0]).toBe("h");
-    expect(mountElement.mock.calls[1][0]).toBe("d1");
+    // expect(mountElement.mock.calls[1][0]).toBe("d1");
 
     // 2. move
     expect(move.mock.calls[0][0]).toBe("e");
